@@ -2,9 +2,11 @@ import React from 'react';
 import { UploadCloud, FileSpreadsheet, RefreshCw, HelpCircle, Download } from 'lucide-react';
 import { downloadExcelTemplate } from '../utils/templateGenerator';
 
+import { TabType } from '../types';
+
 interface HeaderProps {
-  activeTab: 'overview' | 'kocList' | 'kocDetail' | 'kocSuggest';
-  onTabChange: (tab: 'overview' | 'kocList' | 'kocDetail' | 'kocSuggest') => void;
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
   onOpenImport: () => void;
   onOpenSchema: () => void;
   currentDataset: string;
@@ -19,8 +21,9 @@ export const Header: React.FC<HeaderProps> = ({
   currentDataset,
   onToggleDataset,
 }) => {
-  const navTabs = [
+  const navTabs: { id: TabType; label: string }[] = [
     { id: 'overview', label: 'Tổng quan' },
+    { id: 'productAnalytics', label: 'Sản phẩm bán chạy' },
     { id: 'kocList', label: 'Danh sách KOC' },
     { id: 'kocDetail', label: 'Chi tiết KOC' },
     { id: 'kocSuggest', label: 'Gợi ý KOC' },

@@ -98,9 +98,57 @@ export interface FilterState {
   kocName: string;
   bookingDate: string;
   searchQuery: string;
+  category?: string;
+  productName?: string;
 }
 
+export interface ProductItem {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  totalGmv: number;
+  unitsSold: number;
+  orders: number;
+  views: number;
+  clicks: number;
+  kocCount: number;
+  videoCount: number;
+  topKocName: string;
+  topKocId: string;
+  topKocGmv: number;
+  cvr: number; // Conversion rate %
+  ctr: number; // Click-through rate %
+  aov: number; // Average order value
+}
+
+export interface ProductCategorySummary {
+  category: string;
+  totalGmv: number;
+  orders: number;
+  unitsSold: number;
+  productCount: number;
+  kocCount: number;
+  videoCount: number;
+  percentage: number;
+}
+
+export interface KocProductAffinity {
+  kocId: string;
+  kocName: string;
+  productName: string;
+  category: string;
+  videoCount: number;
+  gmv: number;
+  orders: number;
+  views: number;
+  clicks: number;
+  contributionPercent: number;
+}
+
+export type TabType = 'overview' | 'kocList' | 'kocDetail' | 'productAnalytics' | 'kocSuggest';
 export type OverviewMetricType = 'totalGmv' | 'organicGmv' | 'adsGmv' | 'totalCost' | 'roas';
 export type OverviewDimensionType = 'messageTag' | 'campaign' | 'targetGroup' | 'bookingType';
 export type TrendMetricType = 'adsGmv' | 'organicGmv' | 'totalGmv' | 'totalCost' | 'roas' | 'views' | 'orders';
 export type TrendDimensionType = 'day' | 'week' | 'month';
+

@@ -5,17 +5,18 @@ import { OverviewTab } from './components/OverviewTab';
 import { KocListTab } from './components/KocListTab';
 import { KocDetailTab } from './components/KocDetailTab';
 import { KocSuggestTab } from './components/KocSuggestTab';
+import { ProductAnalyticsTab } from './components/ProductAnalyticsTab';
 import { DataImportModal } from './components/DataImportModal';
 import { DataSchemaModal } from './components/DataSchemaModal';
 
 import { mockKocs, mockVideos, mockLivestreams, mockDailyTrends } from './data/mockData';
 import { anpasoKocs, anpasoVideos } from './data/anpasoRealData';
-import { FilterState, KOC, VideoItem, DailyTrendItem } from './types';
+import { FilterState, KOC, VideoItem, DailyTrendItem, TabType } from './types';
 import { filterAndScaleKocs } from './utils/calculations';
 
 export const App: React.FC = () => {
   // Navigation
-  const [activeTab, setActiveTab] = useState<'overview' | 'kocList' | 'kocDetail' | 'kocSuggest'>('overview');
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
 
   // Datasets
   const [currentDataset, setCurrentDataset] = useState<'Mẫu Chuẩn' | 'Anpaso (Thực tế)' | string>('Mẫu Chuẩn');
@@ -147,6 +148,14 @@ export const App: React.FC = () => {
               views={views}
               clicks={clicks}
               orders={orders}
+            />
+          )}
+
+          {activeTab === 'productAnalytics' && (
+            <ProductAnalyticsTab
+              kocs={filteredKocs}
+              videos={videosData}
+              onSelectKoc={handleSelectKocAndDrilldown}
             />
           )}
 

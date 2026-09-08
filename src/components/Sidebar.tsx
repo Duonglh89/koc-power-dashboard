@@ -8,6 +8,7 @@ interface SidebarProps {
   onResetFilters: () => void;
   kocs: KOC[];
   dateRangeLabel: string;
+  categories?: string[];
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -16,6 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onResetFilters,
   kocs,
   dateRangeLabel,
+  categories = [],
 }) => {
   const pics = Array.from(new Set(kocs.map(k => k.pic))).filter(Boolean);
   const targetGroups = Array.from(new Set(kocs.map(k => k.targetGroup))).filter(Boolean);
@@ -23,6 +25,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const statuses = ['Hoạt động', 'Tạm dừng', 'Đã hoàn thành'];
   const kocNames = Array.from(new Set(kocs.map(k => k.name))).filter(Boolean);
   const kocIds = Array.from(new Set(kocs.map(k => k.id))).filter(Boolean);
+
+  const defaultCategories = [
+    'Mì & Nui Rau Củ Ăn Dặm',
+    'Dầu Ăn & Gia Vị Hữu Cơ',
+    'Bánh & Snack Dinh Dưỡng',
+    'Combo & Set Quà Tiết Kiệm',
+  ];
+  const productCategories = categories.length > 0 ? categories : defaultCategories;
 
   const timeRanges = [
     { id: '30_days', label: '30 ngày qua' },
@@ -191,6 +201,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <option value="All">All</option>
                 {statuses.map(st => (
                   <option key={st} value={st}>{st}</option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-2.5 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Slicer: Nhóm sản phẩm */}
+          <div>
+            <label className="block text-[11px] font-semibold text-slate-600 mb-1">Nhóm sản phẩm</label>
+            <div className="relative">
+              <select
+                value={filters.category || 'All'}
+                onChange={e => onFilterChange({ category: e.target.value })}
+                className="w-full bg-white border border-slate-200 rounded-md py-1.5 px-2.5 text-xs text-slate-700 appearance-none focus:outline-none focus:border-navy-600 focus:ring-1 focus:ring-navy-600 pr-7"
+              >
+                <option value="All">Tất cả nhóm ({productCategories.length})</option>
+                {productCategories.map(c => (
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-2.5 pointer-events-none" />
