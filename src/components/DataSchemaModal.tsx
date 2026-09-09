@@ -84,18 +84,16 @@ export const DataSchemaModal: React.FC<DataSchemaModalProps> = ({ isOpen, onClos
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="border border-slate-200 rounded-lg p-3 bg-white space-y-2">
                   <div className="font-bold text-navy-800 text-xs border-b pb-1.5 flex items-center justify-between">
-                    <span>1. Hàng 8 Thẻ KPI Đầu trang</span>
+                    <span>1. Hàng 6 Thẻ KPI Đầu trang</span>
                     <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Top Cards</span>
                   </div>
                   <ul className="space-y-1.5 text-[11px] text-slate-600">
                     <li>• <strong>Số KOC</strong>: Đếm số lượng KOC độc nhất (Distinct Count ID KOC).</li>
                     <li>• <strong>Số Video</strong>: Tổng số dòng trong bảng Fact_Video.</li>
                     <li>• <strong>Số phiên live</strong>: Tổng số phiên trong Fact_Livestream.</li>
-                    <li>• <strong>Tổng doanh thu (GMV)</strong>: Tổng cột <code>GMV</code> từ Video + Live.</li>
-                    <li>• <strong>Doanh thu tự nhiên</strong>: Cột <code>GMV trực tiếp</code>.</li>
-                    <li>• <strong>Doanh thu quảng cáo</strong>: Cột <code>GMV Ads</code> (từ Spark Ads).</li>
+                    <li>• <strong>Doanh thu chung (GMV)</strong>: Tổng doanh thu bán được từ Video + Live.</li>
                     <li>• <strong>Tổng chi phí</strong>: <code>Phí Booking + Phí Ads + Phí hoa hồng</code>.</li>
-                    <li>• <strong>ROAS</strong>: <code>Tổng GMV / Tổng Chi phí</code>.</li>
+                    <li>• <strong>ROAS</strong>: <code>Doanh thu chung / Tổng Chi phí</code>.</li>
                   </ul>
                 </div>
 

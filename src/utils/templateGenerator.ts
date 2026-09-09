@@ -138,12 +138,12 @@ export function downloadExcelTemplate() {
 
   // Sheet 5: Huong_Dan_Format (Hướng dẫn định dạng)
   const guideData = [
-    { 'Mục hiển thị trên Dashboard': '1. Thẻ KPI Tổng (Top Cards)', 'Cột dữ liệu yêu cầu': 'Tổng GMV, GMV tự nhiên, GMV Ads, Tổng Chi phí, Số KOC, Số Video, Số Live', 'Giải thích & Ghi chú': 'Tự động tính từ các bảng Dim_KOC, Fact_Video, Fact_Ads_Cost' },
+    { 'Mục hiển thị trên Dashboard': '1. Thẻ KPI Tổng (Top Cards)', 'Cột dữ liệu yêu cầu': 'Doanh thu chung (GMV), Tổng Chi phí, Số KOC, Số Video, Số Live, ROAS', 'Giải thích & Ghi chú': 'Tự động tính từ các bảng Dim_KOC, Fact_Video, Fact_Ads_Cost' },
     { 'Mục hiển thị trên Dashboard': '2. Phễu chuyển đổi (Funnel Chart)', 'Cột dữ liệu yêu cầu': 'Lượt xem (VV) ➔ Lượt click ➔ Đơn hàng', 'Giải thích & Ghi chú': 'Tính CTR (Click/View) và CVR (Đơn/Click)' },
     { 'Mục hiển thị trên Dashboard': '3. Biểu đồ động (Dynamic Bar)', 'Cột dữ liệu yêu cầu': 'Thông điệp, Chiến dịch, Nhóm mục tiêu, Loại booking', 'Giải thích & Ghi chú': 'Cho phép chọn hiển thị theo từng chiều phân tích' },
-    { 'Mục hiển thị trên Dashboard': '4. Top 10 KOC Bar Chart', 'Cột dữ liệu yêu cầu': 'Tên KOC, Tổng GMV, ROAS', 'Giải thích & Ghi chú': 'Tự động xếp hạng 10 KOC có GMV hoặc ROAS cao nhất' },
+    { 'Mục hiển thị trên Dashboard': '4. Top 10 KOC Bar Chart', 'Cột dữ liệu yêu cầu': 'Tên KOC, Doanh thu chung, ROAS', 'Giải thích & Ghi chú': 'Tự động xếp hạng 10 KOC có GMV hoặc ROAS cao nhất' },
     { 'Mục hiển thị trên Dashboard': '5. Cơ cấu Chi phí (Donut Chart)', 'Cột dữ liệu yêu cầu': 'Phí chạy Ads, Phí hoa hồng Affiliate, Phí Booking', 'Giải thích & Ghi chú': 'Tính tỷ lệ % từng loại chi phí trong tổng chi phí' },
-    { 'Mục hiển thị trên Dashboard': '6. Biểu đồ xu hướng (Trendline)', 'Cột dữ liệu yêu cầu': 'Ngày, Doanh thu quảng cáo, Doanh thu tự nhiên, ROAS', 'Giải thích & Ghi chú': 'Vẽ đường biến động theo ngày/tuần/tháng' },
+    { 'Mục hiển thị trên Dashboard': '6. Biểu đồ xu hướng (Trendline)', 'Cột dữ liệu yêu cầu': 'Ngày, Doanh thu chung (GMV), ROAS', 'Giải thích & Ghi chú': 'Vẽ đường biến động theo ngày/tuần/tháng' },
     { 'Mục hiển thị trên Dashboard': '7. Bảng ma trận KOC (Matrix Table)', 'Cột dữ liệu yêu cầu': 'Nhóm mục tiêu, PIC, Loại booking, Số video, GMV, Chi phí, ROAS', 'Giải thích & Ghi chú': 'Cung cấp nút [+] mở rộng phân cấp nhóm' },
     { 'Mục hiển thị trên Dashboard': '8. Trang Chi tiết KOC (Drilldown)', 'Cột dữ liệu yêu cầu': 'Followers, TikTok Handle, PIC, Video List, Live List', 'Giải thích & Ghi chú': 'Hiển thị hồ sơ chi tiết và 2 bảng Video & Livestream' }
   ];

@@ -45,7 +45,7 @@ export const KocDetailTab: React.FC<KocDetailTabProps> = ({
   const convRate = clicks > 0 ? (orders / clicks) * 100 : 0;
 
   // Trend Controls for Single KOC
-  const [trendMetric, setTrendMetric] = useState<'organicGmv' | 'adsGmv' | 'totalGmv'>('organicGmv');
+  const [trendMetric, setTrendMetric] = useState<'totalGmv'>('totalGmv');
 
   return (
     <div className="p-4 space-y-4">
@@ -124,21 +124,11 @@ export const KocDetailTab: React.FC<KocDetailTabProps> = ({
         </div>
       </div>
 
-      {/* 2. 8 KPI CARDS FOR SINGLE KOC */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-        <div className="custom-card p-3">
-          <div className="text-slate-500 text-[11px] font-semibold">Tổng doanh thu</div>
-          <div className="text-lg font-extrabold text-navy-800 mt-1">{formatCurrency(selectedKoc?.totalGmv, true)}</div>
-        </div>
-
-        <div className="custom-card p-3">
-          <div className="text-slate-500 text-[11px] font-semibold">Doanh thu tự nhiên</div>
-          <div className="text-lg font-extrabold text-navy-800 mt-1">{formatCurrency(selectedKoc?.organicGmv, true)}</div>
-        </div>
-
-        <div className="custom-card p-3">
-          <div className="text-slate-500 text-[11px] font-semibold">Doanh thu quảng cáo</div>
-          <div className="text-lg font-extrabold text-navy-800 mt-1">{formatCurrency(selectedKoc?.adsGmv, true)}</div>
+      {/* 2. 6 KPI CARDS FOR SINGLE KOC */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="custom-card p-3 bg-sky-50/50 border border-sky-200">
+          <div className="text-sky-800 text-[11px] font-bold">Doanh thu chung (GMV)</div>
+          <div className="text-lg font-black text-sky-900 mt-1">{formatCurrency(selectedKoc?.totalGmv, true)}</div>
         </div>
 
         <div className="custom-card p-3">
@@ -242,9 +232,7 @@ export const KocDetailTab: React.FC<KocDetailTabProps> = ({
                 onChange={e => setTrendMetric(e.target.value as any)}
                 className="font-bold text-navy-800 bg-slate-100 border border-slate-200 rounded px-2.5 py-1 focus:outline-none"
               >
-                <option value="organicGmv">Doanh thu tự nhiên</option>
-                <option value="adsGmv">Doanh thu quảng cáo</option>
-                <option value="totalGmv">Tổng doanh thu</option>
+                <option value="totalGmv">Doanh thu chung (GMV)</option>
               </select>
               <span className="text-slate-500">theo Ngày</span>
             </div>

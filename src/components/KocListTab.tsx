@@ -50,8 +50,6 @@ export const KocListTab: React.FC<KocListTabProps> = ({ kocs, onSelectKoc }) => 
   const totalVideo = filtered.reduce((a, k) => a + k.videoCount, 0);
   const totalLive = filtered.reduce((a, k) => a + k.liveCount, 0);
   const totalGmv = filtered.reduce((a, k) => a + k.totalGmv, 0);
-  const totalOrganicGmv = filtered.reduce((a, k) => a + k.organicGmv, 0);
-  const totalAdsGmv = filtered.reduce((a, k) => a + k.adsGmv, 0);
   const totalCost = filtered.reduce((a, k) => a + k.totalCost, 0);
   const avgRoas = totalCost > 0 ? totalGmv / totalCost : 0;
   const totalBookingFee = filtered.reduce((a, k) => a + k.bookingFee, 0);
@@ -59,10 +57,10 @@ export const KocListTab: React.FC<KocListTabProps> = ({ kocs, onSelectKoc }) => 
 
   // Export to CSV
   const handleExportCSV = () => {
-    const header = ['ID KOC', 'Tên KOC', 'TikTok Handle', 'Nhân sự', 'Nhóm', 'Loại', 'Số Video', 'Số Live', 'Tổng Doanh Thu', 'DT Tự Nhiên', 'DT Ads', 'Tổng Chi Phí', 'ROAS', 'Phí Booking', 'Phí Ads'];
+    const header = ['ID KOC', 'Tên KOC', 'TikTok Handle', 'Nhân sự', 'Nhóm', 'Loại', 'Số Video', 'Số Live', 'Doanh Thu Chung', 'Tổng Chi Phí', 'ROAS', 'Phí Booking', 'Phí Ads'];
     const rows = filtered.map(k => [
       k.id, k.name, k.tiktokHandle, k.pic, k.targetGroup, k.bookingType,
-      k.videoCount, k.liveCount, k.totalGmv, k.organicGmv, k.adsGmv,
+      k.videoCount, k.liveCount, k.totalGmv,
       k.totalCost, k.roas, k.bookingFee, k.adsSpend
     ]);
     const csvContent = "data:text/csv;charset=utf-8," + [header, ...rows].map(e => e.join(",")).join("\n");
@@ -138,9 +136,7 @@ export const KocListTab: React.FC<KocListTabProps> = ({ kocs, onSelectKoc }) => 
                 </th>
                 <th className="py-3 px-2 text-right">Số Video</th>
                 <th className="py-3 px-2 text-right">Số phiên live</th>
-                <th className="py-3 px-3 text-right">Tổng doanh thu</th>
-                <th className="py-3 px-3 text-right">Doanh thu tự nhiên</th>
-                <th className="py-3 px-3 text-right">Doanh thu quảng cáo</th>
+                <th className="py-3 px-3 text-right">Doanh thu chung (GMV)</th>
                 <th className="py-3 px-3 text-right">Tổng chi phí</th>
                 <th className="py-3 px-2 text-right">ROAS</th>
                 <th className="py-3 px-3 text-right">Phí Booking</th>
@@ -153,8 +149,6 @@ export const KocListTab: React.FC<KocListTabProps> = ({ kocs, onSelectKoc }) => 
                 const gVideo = groupKocs.reduce((a, k) => a + k.videoCount, 0);
                 const gLive = groupKocs.reduce((a, k) => a + k.liveCount, 0);
                 const gGmv = groupKocs.reduce((a, k) => a + k.totalGmv, 0);
-                const gOrganic = groupKocs.reduce((a, k) => a + k.organicGmv, 0);
-                const gAds = groupKocs.reduce((a, k) => a + k.adsGmv, 0);
                 const gCost = groupKocs.reduce((a, k) => a + k.totalCost, 0);
                 const gRoas = gCost > 0 ? gGmv / gCost : 0;
                 const gBooking = groupKocs.reduce((a, k) => a + k.bookingFee, 0);
@@ -178,8 +172,6 @@ export const KocListTab: React.FC<KocListTabProps> = ({ kocs, onSelectKoc }) => 
                       <td className="py-2.5 px-2 text-right">{gVideo}</td>
                       <td className="py-2.5 px-2 text-right">{gLive}</td>
                       <td className="py-2.5 px-3 text-right font-extrabold text-navy-900">{formatCurrency(gGmv)}</td>
-                      <td className="py-2.5 px-3 text-right">{formatCurrency(gOrganic)}</td>
-                      <td className="py-2.5 px-3 text-right">{formatCurrency(gAds)}</td>
                       <td className="py-2.5 px-3 text-right">{formatCurrency(gCost)}</td>
                       <td className="py-2.5 px-2 text-right">
                         <span className={`px-1.5 py-0.5 rounded font-bold ${
@@ -207,8 +199,6 @@ export const KocListTab: React.FC<KocListTabProps> = ({ kocs, onSelectKoc }) => 
                           <td className="py-2 px-2 text-right">{k.videoCount}</td>
                           <td className="py-2 px-2 text-right">{k.liveCount || '-'}</td>
                           <td className="py-2 px-3 text-right font-bold text-navy-800">{formatCurrency(k.totalGmv)}</td>
-                          <td className="py-2 px-3 text-right text-slate-600">{formatCurrency(k.organicGmv)}</td>
-                          <td className="py-2 px-3 text-right text-slate-600">{formatCurrency(k.adsGmv)}</td>
                           <td className="py-2 px-3 text-right text-slate-600">{formatCurrency(k.totalCost)}</td>
                           <td className="py-2 px-2 text-right font-bold">
                             <span className={`${k.roas >= 3 ? 'text-emerald-600' : k.roas < 1.5 ? 'text-rose-600' : 'text-slate-700'}`}>
@@ -230,8 +220,6 @@ export const KocListTab: React.FC<KocListTabProps> = ({ kocs, onSelectKoc }) => 
                 <td className="py-3 px-2 text-right">{totalVideo}</td>
                 <td className="py-3 px-2 text-right">{totalLive}</td>
                 <td className="py-3 px-3 text-right text-sky-300 font-black">{formatCurrency(totalGmv)}</td>
-                <td className="py-3 px-3 text-right">{formatCurrency(totalOrganicGmv)}</td>
-                <td className="py-3 px-3 text-right">{formatCurrency(totalAdsGmv)}</td>
                 <td className="py-3 px-3 text-right">{formatCurrency(totalCost)}</td>
                 <td className="py-3 px-2 text-right text-emerald-300">{avgRoas.toFixed(2)}</td>
                 <td className="py-3 px-3 text-right">{formatCurrency(totalBookingFee)}</td>

@@ -58,11 +58,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
   // Top 10 Toggle: Revenue or ROAS
   const [top10Mode, setTop10Mode] = useState<'revenue' | 'roas'>('revenue');
 
-  // Breakdown Toggle: Revenue or Cost
-  const [breakdownMode, setBreakdownMode] = useState<'cost' | 'revenue'>('cost');
-
   // Trend Controls
-  const [trendMetric, setTrendMetric] = useState<TrendMetricType>('adsGmv');
+  const [trendMetric, setTrendMetric] = useState<TrendMetricType>('totalGmv');
   const [trendDim, setTrendDim] = useState<TrendDimensionType>('day');
 
   // Totals calculations
@@ -103,27 +100,20 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
     { name: 'Phí Booking', value: totalBookingFee || Math.round(totalCost * 0.018), color: '#0d3b66' },
   ];
 
-  const revenueDonutData = [
-    { name: 'Doanh thu quảng cáo', value: adsGmv, color: '#165294' },
-    { name: 'Doanh thu tự nhiên', value: organicGmv, color: '#38bdf8' },
-  ];
-
-  const currentDonutData = breakdownMode === 'cost' ? costDonutData : revenueDonutData;
+  const currentDonutData = costDonutData;
   const currentDonutTotal = currentDonutData.reduce((a, b) => a + b.value, 0);
 
   // Metric Options for Dropdown
   const metricOptionsList: { id: OverviewMetricType; label: string }[] = [
-    { id: 'totalGmv', label: 'Tổng doanh thu' },
-    { id: 'organicGmv', label: 'Doanh thu tự nhiên' },
-    { id: 'adsGmv', label: 'Doanh thu quảng cáo' },
+    { id: 'totalGmv', label: 'Doanh thu chung' },
     { id: 'totalCost', label: 'Tổng chi phí' },
     { id: 'roas', label: 'ROAS' },
   ];
 
   return (
     <div className="space-y-4 p-4">
-      {/* 1. TOP 8 KPI SUMMARY CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+      {/* 1. TOP 6 KPI SUMMARY CARDS */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Số KOC */}
         <div className="custom-card p-3 flex flex-col justify-between">
           <div className="text-slate-500 text-[11px] font-semibold">Số KOC</div>
@@ -144,27 +134,11 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           <div className="text-2xl font-extrabold text-navy-800 mt-1">{totalLive}</div>
         </div>
 
-        {/* Tổng doanh thu */}
-        <div className="custom-card p-3 flex flex-col justify-between">
-          <div className="text-slate-500 text-[11px] font-semibold">Tổng doanh thu</div>
-          <div className="text-2xl font-extrabold text-navy-800 mt-1">
+        {/* Doanh thu chung */}
+        <div className="custom-card p-3 flex flex-col justify-between bg-sky-50/50 border border-sky-200">
+          <div className="text-sky-800 text-[11px] font-bold">Doanh thu chung (GMV)</div>
+          <div className="text-2xl font-black text-sky-900 mt-1">
             {formatCurrency(totalGmv, true)}
-          </div>
-        </div>
-
-        {/* Doanh thu tự nhiên */}
-        <div className="custom-card p-3 flex flex-col justify-between">
-          <div className="text-slate-500 text-[11px] font-semibold">Doanh thu tự nhiên</div>
-          <div className="text-2xl font-extrabold text-navy-800 mt-1">
-            {formatCurrency(organicGmv, true)}
-          </div>
-        </div>
-
-        {/* Doanh thu quảng cáo */}
-        <div className="custom-card p-3 flex flex-col justify-between">
-          <div className="text-slate-500 text-[11px] font-semibold">Doanh thu quảng cáo</div>
-          <div className="text-2xl font-extrabold text-navy-800 mt-1">
-            {formatCurrency(adsGmv, true)}
           </div>
         </div>
 
@@ -378,28 +352,11 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
 
       {/* 3. BOTTOM ROW: BREAKDOWN DONUT + TREND LINE CHART */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Cơ cấu Doanh thu / Chi phí (4 cols) */}
+        {/* Cơ cấu Chi phí (4 cols) */}
         <div className="lg:col-span-4 custom-card p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-navy-800">Cơ cấu</span>
-            <div className="inline-flex rounded-md border border-slate-200 bg-slate-100 p-0.5 text-xs font-semibold">
-              <button
-                onClick={() => setBreakdownMode('revenue')}
-                className={`px-2.5 py-1 rounded transition-colors ${
-                  breakdownMode === 'revenue' ? 'bg-navy-800 text-white font-bold' : 'text-slate-600 hover:text-navy-800'
-                }`}
-              >
-                Doanh thu
-              </button>
-              <button
-                onClick={() => setBreakdownMode('cost')}
-                className={`px-2.5 py-1 rounded transition-colors ${
-                  breakdownMode === 'cost' ? 'bg-navy-800 text-white font-bold' : 'text-slate-600 hover:text-navy-800'
-                }`}
-              >
-                Chi phí
-              </button>
-            </div>
+            <span className="text-xs font-bold text-navy-800 uppercase tracking-wide">Cơ Cấu Chi Phí</span>
+            <span className="text-[11px] text-slate-500 font-semibold">{formatCurrency(currentDonutTotal, true)}</span>
           </div>
 
           {/* Donut Chart */}
@@ -422,7 +379,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                 <Tooltip
                   formatter={(val: number) => [
                     `${formatCurrency(val, true)} (${((val / (currentDonutTotal || 1)) * 100).toFixed(1)}%)`,
-                    'Giá trị'
+                    'Chi phí'
                   ]}
                 />
                 <Legend
@@ -450,9 +407,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                 onChange={e => setTrendMetric(e.target.value as any)}
                 className="font-bold text-navy-800 bg-slate-100 border border-slate-200 rounded px-2.5 py-1 focus:outline-none"
               >
-                <option value="adsGmv">Doanh thu quảng cáo</option>
-                <option value="organicGmv">Doanh thu tự nhiên</option>
-                <option value="totalGmv">Tổng doanh thu</option>
+                <option value="totalGmv">Doanh thu chung (GMV)</option>
                 <option value="totalCost">Tổng chi phí</option>
                 <option value="roas">ROAS</option>
                 <option value="views">Lượt xem</option>

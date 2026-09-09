@@ -307,19 +307,18 @@ export function downloadGoogleSheetCSVTemplate() {
     'Lượt xem (VV)',
     'Lượt nhấp SP',
     'Đơn hàng SKU',
-    'Tổng GMV (₫)',
-    'GMV trực tiếp (₫)',
+    'Doanh thu chung (GMV) (₫)',
     'Phí Booking (₫)',
     'Tiền chạy Ads (₫)',
   ];
 
   const sampleRows = [
-    ['Mê trái cây 🍇', '@me_trai_cay', '850000', 'Nhân sự 1', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-10', 'Dầu Ăn Dặm Ép Lạnh Nguyên Chất Anpaso 100ml', 'Dầu Ăn & Gia Vị Hữu Cơ', 'Bổ sung chất béo tốt cho bé ăn dặm 🌱 #dauandam #anpaso', '220000', '1171', '180', '34500000', '28900000', '0', '12500000'],
-    ['Hải Mây 🐼☁️', '@haimay_daily', '620000', 'Nhân sự 2', 'Nhóm mục tiêu 2', 'Booking', 'Hoạt động', '2026-02-12', 'Mì Somen Rau Củ Anpaso Cho Bé Ăn Dặm 300g', 'Mì & Nui Rau Củ Ăn Dặm', 'Mì rau củ somen cho bé 7M tập nhai nuốt cực tốt #misomen', '85000', '520', '45', '7500000', '6500000', '3000000', '1200000'],
-    ['Dưỡng Ngầm Skincare ❤️', '@duongngam_beauty', '430000', 'Nhân sự 1', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-15', 'Bột Nêm Rau Củ Tự Nhiên Không Muối Anpaso 60g', 'Dầu Ăn & Gia Vị Hữu Cơ', 'Bí quyết nêm cháo ngọt thanh tự nhiên cho con #botnem #andam', '145000', '980', '120', '18600000', '15200000', '0', '6400000'],
-    ['ThươngPinK', '@thuongpink_pinky', '510000', 'Nhân sự 3', 'Nhóm mục tiêu 2', 'Booking', 'Hoạt động', '2026-02-18', 'Bánh Gạo Hữu Cơ Ăn Dặm Tự Tan Vị Táo & Chuối', 'Bánh & Snack Dinh Dưỡng', 'Bánh ăn dặm tự tan không lo hóc nghẹn cho bé #banhandam', '310000', '1540', '210', '24500000', '19800000', '4500000', '8000000'],
-    ['Bác Gấu Đảm Đang', '@bacgau_cook', '780000', 'Nhân sự 2', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-20', 'Combo Ăn Dặm Toàn Diện 5 Món Tiết Kiệm Cho Mẹ', 'Combo & Set Quà Tiết Kiệm', 'Set quà ăn dặm siêu hời tháng này các mẹ ơi #combodinhduong', '420000', '2100', '340', '68500000', '54000000', '0', '22000000'],
-    ['Mẹ Voi Con', '@me_voicon', '290000', 'Nhân sự 1', 'Nhóm mục tiêu 3', 'Freecast', 'Hoạt động', '2026-02-22', 'Nui Chữ Cái Rau Củ Hữu Cơ Cho Bé 200g', 'Mì & Nui Rau Củ Ăn Dặm', 'Tập bốc nhón với nui chữ cái sắc màu #nuiandam #anpaso', '95000', '480', '65', '8900000', '7800000', '0', '2500000'],
+    ['Mê trái cây 🍇', '@me_trai_cay', '850000', 'Nhân sự 1', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-10', 'Dầu Ăn Dặm Ép Lạnh Nguyên Chất Anpaso 100ml', 'Dầu Ăn & Gia Vị Hữu Cơ', 'Bổ sung chất béo tốt cho bé ăn dặm 🌱 #dauandam #anpaso', '220000', '1171', '180', '34500000', '0', '12500000'],
+    ['Hải Mây 🐼☁️', '@haimay_daily', '620000', 'Nhân sự 2', 'Nhóm mục tiêu 2', 'Booking', 'Hoạt động', '2026-02-12', 'Mì Somen Rau Củ Anpaso Cho Bé Ăn Dặm 300g', 'Mì & Nui Rau Củ Ăn Dặm', 'Mì rau củ somen cho bé 7M tập nhai nuốt cực tốt #misomen', '85000', '520', '45', '7500000', '3000000', '1200000'],
+    ['Dưỡng Ngầm Skincare ❤️', '@duongngam_beauty', '430000', 'Nhân sự 1', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-15', 'Bột Nêm Rau Củ Tự Nhiên Không Muối Anpaso 60g', 'Dầu Ăn & Gia Vị Hữu Cơ', 'Bí quyết nêm cháo ngọt thanh tự nhiên cho con #botnem #andam', '145000', '980', '120', '18600000', '0', '6400000'],
+    ['ThươngPinK', '@thuongpink_pinky', '510000', 'Nhân sự 3', 'Nhóm mục tiêu 2', 'Booking', 'Hoạt động', '2026-02-18', 'Bánh Gạo Hữu Cơ Ăn Dặm Tự Tan Vị Táo & Chuối', 'Bánh & Snack Dinh Dưỡng', 'Bánh ăn dặm tự tan không lo hóc nghẹn cho bé #banhandam', '310000', '1540', '210', '24500000', '4500000', '8000000'],
+    ['Bác Gấu Đảm Đang', '@bacgau_cook', '780000', 'Nhân sự 2', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-20', 'Combo Ăn Dặm Toàn Diện 5 Món Tiết Kiệm Cho Mẹ', 'Combo & Set Quà Tiết Kiệm', 'Set quà ăn dặm siêu hời tháng này các mẹ ơi #combodinhduong', '420000', '2100', '340', '68500000', '0', '22000000'],
+    ['Mẹ Voi Con', '@me_voicon', '290000', 'Nhân sự 1', 'Nhóm mục tiêu 3', 'Freecast', 'Hoạt động', '2026-02-22', 'Nui Chữ Cái Rau Củ Hữu Cơ Cho Bé 200g', 'Mì & Nui Rau Củ Ăn Dặm', 'Tập bốc nhón với nui chữ cái sắc màu #nuiandam #anpaso', '95000', '480', '65', '8900000', '0', '2500000'],
   ];
 
   const csvContent = '\uFEFF' + [headers.join(','), ...sampleRows.map(r => r.map(c => `"${c.replace(/"/g, '""')}"`).join(','))].join('\r\n');
