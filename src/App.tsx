@@ -8,11 +8,18 @@ import { KocSuggestTab } from './components/KocSuggestTab';
 import { ProductAnalyticsTab } from './components/ProductAnalyticsTab';
 import { DataImportModal } from './components/DataImportModal';
 import { DataSchemaModal } from './components/DataSchemaModal';
+import { GoogleSheetsModal } from './components/GoogleSheetsModal';
 
 import { mockKocs, mockVideos, mockLivestreams, mockDailyTrends } from './data/mockData';
 import { anpasoKocs, anpasoVideos } from './data/anpasoRealData';
 import { FilterState, KOC, VideoItem, DailyTrendItem, TabType } from './types';
 import { filterAndScaleKocs } from './utils/calculations';
+import {
+  getStoredSheetUrl,
+  getStoredAutoSync,
+  getLastSyncTime,
+  fetchLiveGoogleSheet,
+} from './utils/googleSheetsSync';
 
 export const App: React.FC = () => {
   // Navigation
@@ -23,6 +30,12 @@ export const App: React.FC = () => {
   const [kocsData, setKocsData] = useState<KOC[]>(mockKocs);
   const [videosData, setVideosData] = useState<VideoItem[]>(mockVideos);
   const [trendsData, setTrendsData] = useState<DailyTrendItem[]>(mockDailyTrends);
+
+  // Google Sheets Live Sync State
+  const [isGoogleSheetsOpen, setIsGoogleSheetsOpen] = useState(false);
+  const [googleSheetUrl, setGoogleSheetUrl] = useState<string>(() => getStoredSheetUrl());
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState<string>(() => getLastSyncTime());
 
   // Selected KOC for drill-down
   const [selectedKocId, setSelectedKocId] = useState<string>(mockKocs[0]?.id || 'KOC001');
@@ -95,6 +108,70 @@ export const App: React.FC = () => {
     }
   };
 
+  // Google Sheets Auto Load and Sync Handlers
+  const handleGoogleSheetDataLoaded = (newKocs: KOC[], newVideos: VideoItem[], datasetName: string) => {
+    setKocsData(newKocs);
+    if (newVideos && newVideos.length > 0) {
+      setVideosData(newVideos);
+    }
+    setCurrentDataset(datasetName);
+    setGoogleSheetUrl(getStoredSheetUrl());
+    setLastSyncTime(getLastSyncTime());
+    if (newKocs.length > 0) {
+      setSelectedKocId(newKocs[0].id);
+    }
+  };
+
+  const handleQuickSync = async () => {
+    const url = getStoredSheetUrl();
+    if (!url) {
+      setIsGoogleSheetsOpen(true);
+      return;
+    }
+
+    setIsSyncing(true);
+    try {
+      const result = await fetchLiveGoogleSheet(url);
+      handleGoogleSheetDataLoaded(result.kocs, result.videos, 'Google Sheet Trực Tuyến');
+    } catch (e: any) {
+      console.error('Quick sync error:', e);
+      alert('Không thể đồng bộ từ Google Sheet: ' + e.message);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Initial load from Google Sheet if configured, plus periodic sync
+  React.useEffect(() => {
+    const storedUrl = getStoredSheetUrl();
+    if (storedUrl) {
+      fetchLiveGoogleSheet(storedUrl)
+        .then(result => {
+          handleGoogleSheetDataLoaded(result.kocs, result.videos, 'Google Sheet Trực Tuyến');
+        })
+        .catch(err => {
+          console.warn('Initial Google Sheet sync failed:', err.message);
+        });
+    }
+
+    // Interval sync (every 60 seconds if auto-sync is on)
+    const interval = setInterval(() => {
+      const activeUrl = getStoredSheetUrl();
+      const autoSyncEnabled = getStoredAutoSync();
+      if (activeUrl && autoSyncEnabled) {
+        fetchLiveGoogleSheet(activeUrl)
+          .then(result => {
+            setKocsData(result.kocs);
+            if (result.videos.length > 0) setVideosData(result.videos);
+            setLastSyncTime(getLastSyncTime());
+          })
+          .catch(() => {});
+      }
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Perform dynamic date filtering and proportional metric scaling
   const {
     filteredKocs,
@@ -129,6 +206,11 @@ export const App: React.FC = () => {
           onTabChange={setActiveTab}
           onOpenImport={() => setIsImportOpen(true)}
           onOpenSchema={() => setIsSchemaOpen(true)}
+          onOpenGoogleSheets={() => setIsGoogleSheetsOpen(true)}
+          isGoogleSheetConnected={Boolean(googleSheetUrl)}
+          onQuickSync={handleQuickSync}
+          isSyncing={isSyncing}
+          lastSyncTime={lastSyncTime}
           currentDataset={currentDataset}
           onToggleDataset={handleToggleDataset}
         />
@@ -191,6 +273,14 @@ export const App: React.FC = () => {
       <DataSchemaModal
         isOpen={isSchemaOpen}
         onClose={() => setIsSchemaOpen(false)}
+      />
+
+      {/* 5. Google Sheets Database & Live Sync Modal */}
+      <GoogleSheetsModal
+        isOpen={isGoogleSheetsOpen}
+        onClose={() => setIsGoogleSheetsOpen(false)}
+        onDataLoaded={handleGoogleSheetDataLoaded}
+        currentConnectedUrl={googleSheetUrl}
       />
     </div>
   );

@@ -9,6 +9,11 @@ interface HeaderProps {
   onTabChange: (tab: TabType) => void;
   onOpenImport: () => void;
   onOpenSchema: () => void;
+  onOpenGoogleSheets: () => void;
+  isGoogleSheetConnected: boolean;
+  onQuickSync: () => void;
+  isSyncing: boolean;
+  lastSyncTime?: string;
   currentDataset: string;
   onToggleDataset: () => void;
 }
@@ -18,6 +23,11 @@ export const Header: React.FC<HeaderProps> = ({
   onTabChange,
   onOpenImport,
   onOpenSchema,
+  onOpenGoogleSheets,
+  isGoogleSheetConnected,
+  onQuickSync,
+  isSyncing,
+  lastSyncTime,
   currentDataset,
   onToggleDataset,
 }) => {
@@ -76,13 +86,49 @@ export const Header: React.FC<HeaderProps> = ({
           <span>Format Dữ liệu &amp; Template</span>
         </button>
 
+        {/* Google Sheets Database Connection Button */}
+        <button
+          onClick={onOpenGoogleSheets}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border transition-all font-medium ${
+            isGoogleSheetConnected
+              ? 'bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border-emerald-500/50 shadow-sm'
+              : 'bg-navy-700 hover:bg-navy-600 text-slate-200 hover:text-white border-navy-600'
+          }`}
+          title={isGoogleSheetConnected ? `Đang liên kết Google Sheets (Cập nhật: ${lastSyncTime || 'vừa xong'}). Bấm để cấu hình.` : 'Kết nối Google Sheets làm Cơ sở dữ liệu'}
+        >
+          {isGoogleSheetConnected ? (
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          ) : (
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+          )}
+          <span>
+            {isGoogleSheetConnected ? (
+              <>Sheet: <strong className="text-white">Online</strong></>
+            ) : (
+              'Database Google Sheet'
+            )}
+          </span>
+        </button>
+
+        {/* Quick Sync Button */}
+        {isGoogleSheetConnected && (
+          <button
+            onClick={onQuickSync}
+            disabled={isSyncing}
+            className="p-1.5 rounded-md bg-emerald-700 hover:bg-emerald-600 text-white transition-colors flex items-center justify-center"
+            title="Đồng bộ lại dữ liệu từ Google Sheet ngay lập tức"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+          </button>
+        )}
+
         {/* Upload Excel Modal */}
         <button
           onClick={onOpenImport}
           className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white px-3.5 py-1.5 rounded-md font-semibold shadow-sm transition-all"
         >
           <UploadCloud className="w-4 h-4" />
-          <span>Nạp Excel / Sheets</span>
+          <span>Nạp Excel / File</span>
         </button>
       </div>
     </header>
