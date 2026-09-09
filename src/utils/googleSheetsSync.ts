@@ -116,9 +116,8 @@ export function parseSheetRows(rows: any[], sourceName: string = 'Google Sheets'
 
     if (!creatorName) return;
 
-    // Metrics
-    const gmv = parseFloat(String(r['Tổng GMV (₫)'] || r['GMV đến từ video (₫)'] || r['GMV'] || r['Doanh thu'] || 0).replace(/[^0-9.-]+/g, '')) || 0;
-    const gmvDir = parseFloat(String(r['GMV trực tiếp (₫)'] || r['GMV video (₫)'] || r['GMV trực tiếp'] || 0).replace(/[^0-9.-]+/g, '')) || 0;
+    // Metrics: Tổng GMV (₫) để lấy doanh số duy nhất
+    const gmv = parseFloat(String(r['Tổng GMV (₫)'] || r['Tổng GMV'] || r['GMV đến từ video (₫)'] || r['GMV'] || r['Doanh thu'] || r['Doanh thu chung (GMV) (₫)'] || 0).replace(/[^0-9.-]+/g, '')) || 0;
     const views = parseFloat(String(r['Lượt xem (VV)'] || r['VV'] || r['Lượt xem'] || r['Views'] || 0).replace(/[^0-9.-]+/g, '')) || 0;
     const clicks = parseFloat(String(r['Lượt nhấp SP'] || r['Lượt nhấp sản phẩm'] || r['Clicks'] || 0).replace(/[^0-9.-]+/g, '')) || 0;
     const orders = parseFloat(String(r['Đơn hàng SKU'] || r['Đơn hàng SKU đã ghi nhận'] || r['Đơn hàng'] || r['Orders'] || 0).replace(/[^0-9.-]+/g, '')) || 0;
@@ -169,8 +168,8 @@ export function parseSheetRows(rows: any[], sourceName: string = 'Google Sheets'
     const currentKoc = kocMap[creatorName];
     currentKoc.videoCount += 1;
     currentKoc.totalGmv += gmv;
-    currentKoc.organicGmv += gmvDir > 0 ? gmvDir : Math.round(gmv * 0.48);
-    currentKoc.adsGmv += gmv - (gmvDir > 0 ? gmvDir : Math.round(gmv * 0.48));
+    currentKoc.organicGmv = 0;
+    currentKoc.adsGmv = 0;
     currentKoc.views += views;
     currentKoc.impressions += Math.round(views * 1.08);
     currentKoc.clicks += clicks;
@@ -198,8 +197,8 @@ export function parseSheetRows(rows: any[], sourceName: string = 'Google Sheets'
       prodClicks: clicks,
       orders: orders,
       gmv: gmv,
-      gmvDirect: gmvDir > 0 ? gmvDir : Math.round(gmv * 0.48),
-      gmvIndirect: gmv - (gmvDir > 0 ? gmvDir : Math.round(gmv * 0.48)),
+      gmvDirect: gmv,
+      gmvIndirect: 0,
       gpm: views > 0 ? Math.round((gmv / views) * 1000) : 0,
       ctr: views > 0 ? Number(((clicks / views) * 100).toFixed(2)) : 0,
       ctor: clicks > 0 ? Number(((orders / clicks) * 100).toFixed(2)) : 0,
@@ -307,7 +306,7 @@ export function downloadGoogleSheetCSVTemplate() {
     'Lượt xem (VV)',
     'Lượt nhấp SP',
     'Đơn hàng SKU',
-    'Doanh thu chung (GMV) (₫)',
+    'Tổng GMV (₫)',
     'Phí Booking (₫)',
     'Tiền chạy Ads (₫)',
   ];

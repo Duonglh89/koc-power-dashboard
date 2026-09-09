@@ -69,8 +69,6 @@ export function downloadExcelTemplate() {
       'Lượt nhấp SP': 1171,
       'Đơn hàng SKU': 180,
       'Tổng GMV (₫)': 34500000,
-      'GMV trực tiếp (₫)': 28900000,
-      'GMV gián tiếp (₫)': 5600000
     },
     {
       'ID Video': '7599224975299579157',
@@ -88,8 +86,6 @@ export function downloadExcelTemplate() {
       'Lượt nhấp SP': 20,
       'Đơn hàng SKU': 5,
       'Tổng GMV (₫)': 1850000,
-      'GMV trực tiếp (₫)': 1850000,
-      'GMV gián tiếp (₫)': 0
     }
   ];
   const wsVideo = XLSX.utils.json_to_sheet(videoData);
