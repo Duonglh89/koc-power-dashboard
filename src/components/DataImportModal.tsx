@@ -3,6 +3,7 @@ import { X, UploadCloud, Link as LinkIcon, FileSpreadsheet, CheckCircle2, AlertC
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { KOC } from '../types';
+import { fetchLiveGoogleSheet } from '../utils/googleSheetsSync';
 
 interface DataImportModalProps {
   isOpen: boolean;
@@ -255,27 +256,22 @@ export const DataImportModal: React.FC<DataImportModalProps> = ({
     }
   };
 
-  // Google Sheets import
-  const handleSheetsConnect = () => {
+  // Google Sheets import with CORS support
+  const handleSheetsConnect = async () => {
     if (!sheetsUrl.trim()) return;
     setLoading(true);
-    let csvUrl = sheetsUrl;
-    if (sheetsUrl.includes('/edit')) {
-      csvUrl = sheetsUrl.replace(/\/edit.*$/, '/export?format=csv');
-    }
+    setStatusMsg(null);
 
-    Papa.parse(csvUrl, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        processSingleSheetData(results.data, 'Google Sheets Trực Tuyến');
-      },
-      error: (err) => {
-        setStatusMsg({ type: 'error', text: 'Không thể kết nối Google Sheets: ' + err.message });
-        setLoading(false);
-      }
-    });
+    try {
+      const result = await fetchLiveGoogleSheet(sheetsUrl);
+      onDataLoaded(result.kocs, 'Google Sheets Trực Tuyến');
+      setStatusMsg({ type: 'success', text: `Đã nạp thành công ${result.kocs.length} KOCs từ Google Sheets!` });
+      setLoading(false);
+      setTimeout(() => onClose(), 1200);
+    } catch (err: any) {
+      setStatusMsg({ type: 'error', text: err.message || 'Không thể kết nối Google Sheets' });
+      setLoading(false);
+    }
   };
 
   return (

@@ -9,31 +9,32 @@ export const LOCAL_STORAGE_LAST_SYNC_KEY = 'koc_dashboard_last_sync_time';
 // Default public Google Sheet template URL (for demo / initial connect)
 export const DEFAULT_GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1-u5Rsk2Y8aC2M0X4k4g4-SampleKocDashboard/edit';
 
-// Convert user-provided Google Sheet URL into a direct CSV export endpoint
+// Convert user-provided Google Sheet URL into a direct CSV export endpoint with CORS enabled
 export function normalizeGoogleSheetUrl(rawUrl: string): string {
-  let url = rawUrl.trim();
+  const url = rawUrl.trim();
   if (!url) return '';
 
-  // If URL already contains export?format=csv
-  if (url.includes('/export?format=csv')) return url;
+  // Extract sheet ID: /spreadsheets/d/([a-zA-Z0-9_-]+)
+  const idMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (!idMatch || !idMatch[1]) {
+    // If it's already a published CSV link (e.g. /pub?output=csv)
+    if (url.includes('google.com') && (url.includes('csv') || url.includes('output=csv'))) {
+      return url;
+    }
+    return '';
+  }
 
-  // Extract GID if present
-  let gid = '';
+  const sheetId = idMatch[1];
+
+  // Extract GID if present (#gid=123 or ?gid=123)
+  let gidParam = '';
   const gidMatch = url.match(/[#&?]gid=([0-9]+)/);
   if (gidMatch && gidMatch[1]) {
-    gid = `&gid=${gidMatch[1]}`;
+    gidParam = `&gid=${gidMatch[1]}`;
   }
 
-  // Replace /edit... or trailing slash with /export?format=csv
-  if (url.includes('/edit')) {
-    return url.replace(/\/edit.*$/, `/export?format=csv${gid}`);
-  }
-
-  if (url.match(/\/d\/([a-zA-Z0-9_-]+)/)) {
-    return url.replace(/\/d\/([a-zA-Z0-9_-]+).*/, `/d/$1/export?format=csv${gid}`);
-  }
-
-  return url;
+  // Use Google Visualization API (GViz) CSV export which supports CORS (Access-Control-Allow-Origin: *)
+  return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv${gidParam}`;
 }
 
 export function getStoredSheetUrl(): string {
@@ -231,37 +232,62 @@ export function parseSheetRows(rows: any[], sourceName: string = 'Google Sheets'
   };
 }
 
-// Fetch and parse live data from Google Sheets URL
+// Fetch and parse live data from Google Sheets URL with CORS support & clear error detection
 export async function fetchLiveGoogleSheet(sheetUrl: string): Promise<SheetParseResult> {
-  const exportUrl = normalizeGoogleSheetUrl(sheetUrl);
-  if (!exportUrl) {
-    throw new Error('Link Google Sheet không hợp lệ. Vui lòng kiểm tra lại!');
+  const gvizUrl = normalizeGoogleSheetUrl(sheetUrl);
+  if (!gvizUrl) {
+    throw new Error('Link Google Sheet không đúng định dạng. Vui lòng dán link dạng: https://docs.google.com/spreadsheets/d/.../edit');
   }
 
-  return new Promise((resolve, reject) => {
-    Papa.parse(exportUrl, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        if (!results.data || results.data.length === 0) {
-          reject(new Error('Bảng tính Google Sheet chưa có dòng dữ liệu nào hoặc chưa bật chia sẻ công khai!'));
-          return;
-        }
+  try {
+    const res = await fetch(gvizUrl);
+    if (!res.ok) {
+      throw new Error(`Google trả về mã lỗi HTTP ${res.status}. Vui lòng kiểm tra lại quyền truy cập.`);
+    }
 
-        try {
-          const parsed = parseSheetRows(results.data, 'Google Sheets Trực Tuyến');
-          setLastSyncTime(new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-          resolve(parsed);
-        } catch (err: any) {
-          reject(new Error('Lỗi xử lý dữ liệu: ' + err.message));
-        }
-      },
-      error: (err) => {
-        reject(new Error(`Không thể kết nối tới Google Sheet: ${err.message}. Đảm bảo link đã chia sẻ ở chế độ "Bất kỳ ai có liên kết đều có thể xem"!`));
-      },
+    const text = await res.text();
+
+    // Check if Google redirected to a login page (Private Sheet)
+    if (text.includes('<!DOCTYPE html>') || text.includes('<html') || text.includes('ServiceLogin') || text.includes('accounts.google.com')) {
+      throw new Error(
+        'Google Sheet chưa bật quyền xem công khai!\n👉 Cách khắc phục:\n1. Mở file Google Sheet trên trình duyệt\n2. Bấm nút "Chia sẻ" (Share) ở góc trên bên phải\n3. Chuyển mục Quyền truy cập chung thành: "Bất kỳ ai có đường liên kết đều có thể xem"\n4. Bấm Xong rồi bấm thử lại tại đây.'
+      );
+    }
+
+    return new Promise((resolve, reject) => {
+      Papa.parse(text, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          if (!results.data || results.data.length === 0) {
+            reject(new Error('Bảng tính Google Sheet chưa có dòng dữ liệu nào!'));
+            return;
+          }
+
+          try {
+            const parsed = parseSheetRows(results.data, 'Google Sheet Trực Tuyến');
+            if (parsed.kocs.length === 0) {
+              reject(
+                new Error(
+                  'Không tìm thấy dòng KOC nào hợp lệ trong Sheet. Hãy đảm bảo cột đầu tiên là "Tên nhà sáng tạo" hoặc "Tên KOC" (bạn có thể bấm nút "Tải File Mẫu (.CSV)" để xem chuẩn cột).'
+                )
+              );
+              return;
+            }
+            setLastSyncTime(new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+            resolve(parsed);
+          } catch (err: any) {
+            reject(new Error('Lỗi xử lý dữ liệu từ Sheet: ' + err.message));
+          }
+        },
+        error: (err) => {
+          reject(new Error('Lỗi phân tích cú pháp CSV: ' + err.message));
+        },
+      });
     });
-  });
+  } catch (err: any) {
+    throw new Error(err.message || 'Không thể kết nối tới Google Sheet');
+  }
 }
 
 // Generate and trigger download of a pre-populated CSV template for Google Sheets

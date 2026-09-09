@@ -15,7 +15,7 @@ interface HeaderProps {
   isSyncing: boolean;
   lastSyncTime?: string;
   currentDataset: string;
-  onToggleDataset: () => void;
+  onToggleDataset?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -66,15 +66,14 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Action Tools */}
       <div className="flex items-center gap-2.5 mt-2 sm:mt-0 text-xs">
-        {/* Toggle Dataset Button */}
-        <button
-          onClick={onToggleDataset}
-          className="flex items-center gap-1.5 bg-navy-700 hover:bg-navy-600 text-slate-200 hover:text-white px-3 py-1.5 rounded-md border border-navy-600 transition-colors font-medium shadow-sm"
-          title="Bấm để chuyển đổi giữa Dữ liệu mẫu và Dữ liệu thật Anpaso"
+        {/* Active Dataset Display Pill */}
+        <div
+          className="flex items-center gap-1.5 bg-navy-700/90 text-slate-200 px-3 py-1.5 rounded-md border border-navy-600 text-xs font-medium shadow-sm"
+          title="Nguồn dữ liệu đang hiển thị trên Dashboard"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-sky-400" />
-          <span>Bộ số: <strong className="text-sky-300">{currentDataset}</strong></span>
-        </button>
+          <span className="w-2 h-2 rounded-full bg-sky-400" />
+          <span>Dữ liệu: <strong className="text-sky-300">{currentDataset}</strong></span>
+        </div>
 
         {/* Data Format Guide & Template Download */}
         <button

@@ -25,10 +25,10 @@ export const App: React.FC = () => {
   // Navigation
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
-  // Datasets
-  const [currentDataset, setCurrentDataset] = useState<'Mẫu Chuẩn' | 'Anpaso (Thực tế)' | string>('Mẫu Chuẩn');
-  const [kocsData, setKocsData] = useState<KOC[]>(mockKocs);
-  const [videosData, setVideosData] = useState<VideoItem[]>(mockVideos);
+// Datasets: Use Real Data (Anpaso) as default, completely removing Mẫu Chuẩn
+  const [currentDataset, setCurrentDataset] = useState<string>('Dữ liệu thực tế (Anpaso)');
+  const [kocsData, setKocsData] = useState<KOC[]>(anpasoKocs);
+  const [videosData, setVideosData] = useState<VideoItem[]>(anpasoVideos);
   const [trendsData, setTrendsData] = useState<DailyTrendItem[]>(mockDailyTrends);
 
   // Google Sheets Live Sync State
@@ -38,7 +38,7 @@ export const App: React.FC = () => {
   const [lastSyncTime, setLastSyncTime] = useState<string>(() => getLastSyncTime());
 
   // Selected KOC for drill-down
-  const [selectedKocId, setSelectedKocId] = useState<string>(mockKocs[0]?.id || 'KOC001');
+  const [selectedKocId, setSelectedKocId] = useState<string>(anpasoKocs[0]?.id || '');
 
   // Modals
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -84,19 +84,12 @@ export const App: React.FC = () => {
     setActiveTab('kocDetail');
   };
 
-  const handleToggleDataset = () => {
-    if (currentDataset === 'Mẫu Chuẩn') {
-      setCurrentDataset('Anpaso (Thực tế)');
-      setKocsData(anpasoKocs);
-      setVideosData(anpasoVideos);
-      if (anpasoKocs.length > 0) {
-        setSelectedKocId(anpasoKocs[0].id);
-      }
-    } else {
-      setCurrentDataset('Mẫu Chuẩn');
-      setKocsData(mockKocs);
-      setVideosData(mockVideos);
-      setSelectedKocId(mockKocs[0].id);
+  const handleResetToRealData = () => {
+    setCurrentDataset('Dữ liệu thực tế (Anpaso)');
+    setKocsData(anpasoKocs);
+    setVideosData(anpasoVideos);
+    if (anpasoKocs.length > 0) {
+      setSelectedKocId(anpasoKocs[0].id);
     }
   };
 
@@ -212,7 +205,6 @@ export const App: React.FC = () => {
           isSyncing={isSyncing}
           lastSyncTime={lastSyncTime}
           currentDataset={currentDataset}
-          onToggleDataset={handleToggleDataset}
         />
 
         {/* Dynamic Tab Body */}
