@@ -169,6 +169,7 @@ export const App: React.FC = () => {
   const {
     filteredKocs,
     activeTrends,
+    filteredVideos,
     dateRangeLabel,
     totalGmv,
     organicGmv,
@@ -178,7 +179,7 @@ export const App: React.FC = () => {
     views,
     clicks,
     orders,
-  } = filterAndScaleKocs(kocsData, filters, trendsData);
+  } = filterAndScaleKocs(kocsData, filters, trendsData, videosData);
 
   return (
     <div className="flex min-h-screen bg-[#f1f5f9] text-slate-800">
@@ -228,7 +229,7 @@ export const App: React.FC = () => {
           {activeTab === 'productAnalytics' && (
             <ProductAnalyticsTab
               kocs={filteredKocs}
-              videos={videosData}
+              videos={filteredVideos.length > 0 ? filteredVideos : videosData}
               onSelectKoc={handleSelectKocAndDrilldown}
             />
           )}
@@ -242,7 +243,7 @@ export const App: React.FC = () => {
               kocs={filteredKocs}
               selectedKocId={selectedKocId}
               onSelectKoc={setSelectedKocId}
-              videos={videosData}
+              videos={filteredVideos.length > 0 ? filteredVideos : videosData}
               livestreams={mockLivestreams}
               dailyTrends={activeTrends}
             />
