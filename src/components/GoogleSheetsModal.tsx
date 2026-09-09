@@ -11,6 +11,8 @@ import {
   Clock,
   Sparkles,
   HelpCircle,
+  Code2,
+  Copy,
 } from 'lucide-react';
 import {
   normalizeGoogleSheetUrl,
@@ -42,6 +44,98 @@ export const GoogleSheetsModal: React.FC<GoogleSheetsModalProps> = ({
   const [autoSync, setAutoSync] = useState(true);
   const [lastSync, setLastSync] = useState('');
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [activeSubTab, setActiveSubTab] = useState<'template' | 'script'>('template');
+  const [copiedScript, setCopiedScript] = useState(false);
+
+  const appsScriptCode = `/**
+ * =========================================================================
+ * GOOGLE APPS SCRIPT: TỰ ĐỘNG KHỞI TẠO BẢNG TÍNH & ĐỒNG BỘ KOC DASHBOARD
+ * =========================================================================
+ * 1. Mở Google Sheet -> Tiện ích mở rộng (Extensions) -> Apps Script
+ * 2. Xóa hết code cũ, dán đoạn này vào và bấm Lưu (Ctrl + S)
+ * 3. Bấm "Chạy" (Run) hàm "khoiTaoBangTinhKOC" hoặc reload lại Sheet
+ */
+
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('🚀 KOC Dashboard')
+    .addItem('✨ 1. Tự động tạo Bảng chuẩn & Dữ liệu mẫu', 'khoiTaoBangTinhKOC')
+    .addItem('📋 2. Lấy link kết nối Dashboard', 'layLinkKetNoi')
+    .addToUi();
+}
+
+function khoiTaoBangTinhKOC() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+  sheet.setName('Data_KOC');
+  sheet.clear();
+
+  var headers = [
+    'Tên nhà sáng tạo',
+    'TikTok Handle',
+    'Followers',
+    'Nhân sự quản lý',
+    'Nhóm mục tiêu',
+    'Loại booking',
+    'Trạng thái',
+    'Thời gian đăng',
+    'Sản phẩm gắn kèm',
+    'Nhóm ngành hàng',
+    'Tiêu đề Video / Link',
+    'Lượt xem (VV)',
+    'Lượt nhấp SP',
+    'Đơn hàng SKU',
+    'Tổng GMV (₫)',
+    'Phí Booking (₫)',
+    'Tiền chạy Ads (₫)'
+  ];
+
+  var sampleData = [
+    ['Mê trái cây 🍇', '@me_trai_cay', 850000, 'Nhân sự 1', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-10 14:20:00', 'Dầu Ăn Dặm Ép Lạnh Nguyên Chất Anpaso 100ml', 'Dầu Ăn & Gia Vị Hữu Cơ', 'Bổ sung chất béo tốt cho bé ăn dặm 🌱 #dauandam #anpaso', 220000, 1171, 180, 34500000, 0, 12500000],
+    ['Hải Mây 🐼☁️', '@haimay_daily', 620000, 'Nhân sự 2', 'Nhóm mục tiêu 2', 'Booking', 'Hoạt động', '2026-02-12 18:45:00', 'Mì Somen Rau Củ Anpaso Cho Bé Ăn Dặm 300g', 'Mì & Nui Rau Củ Ăn Dặm', 'Mì rau củ somen cho bé 7M tập nhai nuốt cực tốt #misomen', 85000, 520, 45, 7500000, 3000000, 1200000],
+    ['Dưỡng Ngầm Skincare ❤️', '@duongngam_beauty', 430000, 'Nhân sự 1', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-15 09:15:00', 'Bột Nêm Rau Củ Tự Nhiên Không Muối Anpaso 60g', 'Dầu Ăn & Gia Vị Hữu Cơ', 'Bí quyết nêm cháo ngọt thanh tự nhiên cho con #botnem #andam', 145000, 980, 120, 18600000, 0, 6400000],
+    ['ThươngPinK', '@thuongpink_pinky', 510000, 'Nhân sự 3', 'Nhóm mục tiêu 2', 'Booking', 'Hoạt động', '2026-02-18 20:00:00', 'Bánh Gạo Hữu Cơ Ăn Dặm Tự Tan Vị Táo & Chuối', 'Bánh & Snack Dinh Dưỡng', 'Bánh ăn dặm tự tan không lo hóc nghẹn cho bé #banhandam', 310000, 1540, 210, 24500000, 4500000, 8000000],
+    ['Bác Gấu Đảm Đang', '@bacgau_cook', 780000, 'Nhân sự 2', 'Nhóm mục tiêu 1', 'Freecast', 'Hoạt động', '2026-02-20 11:30:00', 'Combo Ăn Dặm Toàn Diện 5 Món Tiết Kiệm Cho Mẹ', 'Combo & Set Quà Tiết Kiệm', 'Set quà ăn dặm siêu hời tháng này các mẹ ơi #combodinhduong', 420000, 2100, 340, 68500000, 0, 22000000],
+    ['Mẹ Voi Con', '@me_voicon', 290000, 'Nhân sự 1', 'Nhóm mục tiêu 3', 'Freecast', 'Hoạt động', '2026-02-22 16:10:00', 'Nui Chữ Cái Rau Củ Hữu Cơ Cho Bé 200g', 'Mì & Nui Rau Củ Ăn Dặm', 'Tập bốc nhón với nui chữ cái sắc màu #nuiandam #anpaso', 95000, 480, 65, 8900000, 0, 2500000]
+  ];
+
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  var headerRange = sheet.getRange(1, 1, 1, headers.length);
+  headerRange.setBackground('#0f172a');
+  headerRange.setFontColor('#ffffff');
+  headerRange.setFontWeight('bold');
+  headerRange.setHorizontalAlignment('center');
+  headerRange.setVerticalAlignment('middle');
+  sheet.setRowHeight(1, 38);
+
+  sheet.getRange(2, 1, sampleData.length, headers.length).setValues(sampleData);
+  sheet.getRange(2, 3, sampleData.length, 1).setNumberFormat('#,##0');
+  sheet.getRange(2, 8, sampleData.length, 1).setNumberFormat('yyyy-mm-dd hh:mm:ss');
+  sheet.getRange(2, 12, sampleData.length, 3).setNumberFormat('#,##0');
+  sheet.getRange(2, 15, sampleData.length, 3).setNumberFormat('#,##0" ₫"');
+
+  sheet.getRange(2, 6, sampleData.length, 3).setHorizontalAlignment('center');
+  sheet.getRange(1, 1, sampleData.length + 1, headers.length).setBorder(true, true, true, true, true, true, '#cbd5e1', SpreadsheetApp.BorderStyle.SOLID);
+  
+  for (var i = 1; i <= headers.length; i++) {
+    sheet.autoResizeColumn(i);
+  }
+
+  sheet.setFrozenRows(1);
+  SpreadsheetApp.getUi().alert('✅ ĐÃ TẠO XONG BẢNG TÍNH!\\n\\nHãy bấm Chia sẻ (Share) -> Bất kỳ ai có liên kết đều có thể xem.');
+}
+
+function layLinkKetNoi() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var url = ss.getUrl();
+  SpreadsheetApp.getUi().alert('🔗 Link kết nối Dashboard:\\n\\n' + url);
+}`;
+
+  const handleCopyScript = () => {
+    navigator.clipboard.writeText(appsScriptCode);
+    setCopiedScript(true);
+    setTimeout(() => setCopiedScript(false), 2000);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -120,51 +214,114 @@ export const GoogleSheetsModal: React.FC<GoogleSheetsModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-6 space-y-5 text-xs text-slate-700 max-h-[80vh] overflow-y-auto">
-          {/* Step Guide: Create your own sheet */}
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="font-bold text-navy-900 flex items-center gap-1.5 text-xs">
-                <Sparkles className="w-4 h-4 text-amber-500" />
-                <span>Cách tự tạo Google Sheet của bạn trong 3 bước:</span>
-              </div>
-              <button
-                onClick={downloadGoogleSheetCSVTemplate}
-                className="flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 hover:underline"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Tải File Mẫu (.CSV)</span>
-              </button>
-            </div>
-
-            <ol className="space-y-2 text-[11px] text-slate-600 pl-4 list-decimal">
-              <li>
-                <strong>Bước 1:</strong> Bấm{' '}
-                <button onClick={downloadGoogleSheetCSVTemplate} className="text-sky-600 font-bold underline inline">
-                  Tải File Mẫu (.CSV)
-                </button>{' '}
-                về máy (đã có sẵn 18 cột và dữ liệu mẫu chuẩn).
-              </li>
-              <li>
-                <strong>Bước 2:</strong> Mở{' '}
-                <a
-                  href="https://drive.google.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sky-600 font-bold underline inline-flex items-center gap-0.5"
-                >
-                  Google Drive <ExternalLink className="w-2.5 h-2.5 inline" />
-                </a>{' '}
-                ➔ Bấm <strong>Mới ➔ Tải tệp lên</strong> và chọn file vừa tải. File sẽ tự mở thành Google Sheet.
-              </li>
-              <li>
-                <strong>Bước 3:</strong> Trên Google Sheet, bấm nút <strong>Chia sẻ (Share)</strong> ở góc trên bên phải ➔ Chuyển sang:{' '}
-                <span className="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
-                  Bất kỳ ai có đường liên kết đều có thể xem
-                </span>
-                . Sau đó sao chép link và dán vào ô bên dưới.
-              </li>
-            </ol>
+          {/* Sub Tab Switcher: Cách 1 vs Cách 2 */}
+          <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('template')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                activeSubTab === 'template'
+                  ? 'bg-navy-800 text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Cách 1: Tải File CSV Mẫu</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('script')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                activeSubTab === 'script'
+                  ? 'bg-emerald-700 text-white shadow-xs'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Code2 className="w-3.5 h-3.5" />
+              <span>Cách 2: Dùng Google Apps Script (Tự động 100%)</span>
+            </button>
           </div>
+
+          {/* Tab 1: CSV Template Guide */}
+          {activeSubTab === 'template' && (
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-3 animate-in fade-in duration-150">
+              <div className="flex items-center justify-between">
+                <div className="font-bold text-navy-900 flex items-center gap-1.5 text-xs">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <span>Cách tạo Google Sheet từ file CSV mẫu:</span>
+                </div>
+                <button
+                  onClick={downloadGoogleSheetCSVTemplate}
+                  className="flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 hover:underline"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Tải File Mẫu (.CSV)</span>
+                </button>
+              </div>
+
+              <ol className="space-y-2 text-[11px] text-slate-600 pl-4 list-decimal">
+                <li>
+                  <strong>Bước 1:</strong> Bấm{' '}
+                  <button onClick={downloadGoogleSheetCSVTemplate} className="text-sky-600 font-bold underline inline">
+                    Tải File Mẫu (.CSV)
+                  </button>{' '}
+                  về máy (đã có sẵn tiêu đề chuẩn và cột <strong>Tổng GMV (₫)</strong>).
+                </li>
+                <li>
+                  <strong>Bước 2:</strong> Mở{' '}
+                  <a
+                    href="https://drive.google.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sky-600 font-bold underline inline-flex items-center gap-0.5"
+                  >
+                    Google Drive <ExternalLink className="w-2.5 h-2.5 inline" />
+                  </a>{' '}
+                  ➔ Bấm <strong>Mới ➔ Tải tệp lên</strong> và chọn file vừa tải.
+                </li>
+                <li>
+                  <strong>Bước 3:</strong> Mở file trên Google Sheet, bấm <strong>Chia sẻ (Share)</strong> ở góc trên bên phải ➔ Chuyển sang:{' '}
+                  <span className="bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
+                    Bất kỳ ai có đường liên kết đều có thể xem
+                  </span>
+                  . Sau đó dán link vào ô bên dưới.
+                </li>
+              </ol>
+            </div>
+          )}
+
+          {/* Tab 2: Google Apps Script Guide */}
+          {activeSubTab === 'script' && (
+            <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-200/80 space-y-3 animate-in fade-in duration-150">
+              <div className="flex items-center justify-between">
+                <div className="font-bold text-emerald-950 flex items-center gap-1.5 text-xs">
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <span>Chạy 1 lần - Tự tạo bảng và menu KOC Dashboard:</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyScript}
+                  className="flex items-center gap-1.5 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg shadow-xs active:scale-95 transition-all"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>{copiedScript ? 'Đã sao chép!' : 'Sao chép mã Script'}</span>
+                </button>
+              </div>
+
+              <ol className="space-y-1.5 text-[11px] text-slate-700 pl-4 list-decimal">
+                <li>Mở một Google Sheet trắng ➔ Chọn <strong>Tiện ích mở rộng (Extensions) ➔ Apps Script</strong>.</li>
+                <li>Xóa hết nội dung cũ, dán đoạn mã bên dưới vào rồi bấm <strong>Lưu (Ctrl + S)</strong>.</li>
+                <li>Bấm nút <strong>Chạy (Run)</strong> với hàm <code>khoiTaoBangTinhKOC</code> (hoặc tải lại sheet và bấm menu <strong>🚀 KOC Dashboard</strong>).</li>
+                <li>Bấm <strong>Chia sẻ (Share) ➔ Bất kỳ ai có liên kết đều có thể xem</strong> và dán link vào ô bên dưới!</li>
+              </ol>
+
+              <div className="relative">
+                <pre className="bg-slate-900 text-slate-200 p-3 rounded-lg text-[10px] font-mono max-h-36 overflow-y-auto leading-relaxed border border-slate-700 select-all">
+                  {appsScriptCode}
+                </pre>
+              </div>
+            </div>
+          )}
 
           {/* Input URL Section */}
           <div className="space-y-2">
